@@ -1,7 +1,0 @@
-* text=auto
-*.cpp text
-*.h text  
-*.txt text
-*.md text
-*.png binary
-*.jpg binary
