@@ -29,7 +29,7 @@ public:
     virtual ~LoadBalancingAlgorithm() = default;
     virtual Server* SelectServer(const std::string& client_ip = "") = 0;
     virtual void UpdateServerStats(const std::string& server_id, int connections) = 0;
-};
+};//ъ
 
 class RoundRobinAlgorithm : public LoadBalancingAlgorithm {
 private:
