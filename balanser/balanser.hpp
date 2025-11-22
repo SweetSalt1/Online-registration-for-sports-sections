@@ -67,7 +67,7 @@ private:
     LoadBalancerConfig config_;
     std::vector<std::unique_ptr<Server>> backend_servers_;
     std::unique_ptr<LoadBalancingAlgorithm> algorithm_;
-    std::map<std::string, std::string> session_map_; // session_id -> server_id
+    std::map<std::string, std::string> session_map_; 
     
     void HealthCheckWorker();
     std::thread health_check_thread_;
