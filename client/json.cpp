@@ -3,7 +3,7 @@
 
 using json = nlohmann::json;
 
-//  PACK 
+
 
 std::string JSONTool::PackRegister(const std::string& login, const std::string& password) {
     json j;
@@ -35,7 +35,7 @@ std::string JSONTool::PackModeration(const std::string& token, int student_id, b
     return j.dump();
 }
 
-//  UNPACK 
+
 
 bool JSONTool::UnpackSimpleSuccess(const std::string& jsonStr) {
     try {
