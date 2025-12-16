@@ -1,7 +1,6 @@
 set(CLIENT_SOURCES
     api.cpp
     api.h
-    client_a.h
     json.cpp
     json.h
     main.cpp
