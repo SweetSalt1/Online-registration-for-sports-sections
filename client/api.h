@@ -19,7 +19,7 @@ public:
 private:
     std::string Post(const std::string& url, const std::string& body);
     std::string Get(const std::string& url);
-    const std::string BASE_URL = "http://АДРЕСС_СЕРВЕРА";
+    const std::string BASE_URL = "127.0.01::8080";
 
     Session& session_;
 };

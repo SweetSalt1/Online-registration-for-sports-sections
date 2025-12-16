@@ -1,50 +1,17 @@
 #pragma once
 #include <string>
-#include <vector>
+#include "types.h"
 
-struct SectionInfo {
-    int id;
-    std::string name;
-    std::string description;
-};
+class JSONTool {
+public:
+    static std::string PackRegister(const std::string& login, const std::string& password);
+    static std::string PackLogin(const std::string& login, const std::string& password);
+    static std::string PackApplication(const std::string& token, int section_id, const std::string& text);
+    static std::string PackModeration(const std::string& token, int student_id, bool approve);
+    static NotificationsResponse UnpackNotifications(const std::string& json);
 
-struct SectionsResponse {
-    std::vector<SectionInfo> sections;
-};
-
-struct LoginResponse {
-    bool success = false;
-    std::string token;
-    std::string role; // "student" or "secretary"
-};
-
-struct QueueItem {
-    int student_id;
-    std::string student_name;
-    std::string section_name;
-    std::string status;
-};
-
-struct QueueResponse {
-    std::vector<QueueItem> list;
-};
-
-struct Notification {
-    std::string name;
-    std::string description;
-    std::string timestamp;
-};
-
-struct NotificationsResponse {
-    std::vector<Notification> list;
-};
-
-struct ApplicationHistoryItem {
-    int section_id;
-    std::string section_name;
-    std::string status;
-};
-
-struct ApplicationsHistoryResponse {
-    std::vector<ApplicationHistoryItem> list;
+    static bool UnpackSimpleSuccess(const std::string& json);
+    static LoginResponse UnpackLoginResponse(const std::string& json);
+    static SectionsResponse UnpackSections(const std::string& json);
+    static QueueResponse UnpackQueue(const std::string& json);
 };

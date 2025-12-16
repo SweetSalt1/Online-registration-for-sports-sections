@@ -3,7 +3,7 @@
 
 using json = nlohmann::json;
 
-
+//  PACK 
 
 std::string JSONTool::PackRegister(const std::string& login, const std::string& password) {
     json j;
@@ -35,7 +35,7 @@ std::string JSONTool::PackModeration(const std::string& token, int student_id, b
     return j.dump();
 }
 
-
+//  UNPACK 
 
 bool JSONTool::UnpackSimpleSuccess(const std::string& jsonStr) {
     try {
@@ -103,6 +103,26 @@ QueueResponse JSONTool::UnpackQueue(const std::string& jsonStr) {
             q.section_name = el.value("section_name", "");
             q.status = el.value("status", "");
             resp.list.push_back(q);
+        }
+    }
+    catch (...) {}
+
+    return resp;
+}
+
+NotificationsResponse JSONTool::UnpackNotifications(const std::string& jsonStr) {
+    NotificationsResponse resp;
+
+    try {
+        auto j = nlohmann::json::parse(jsonStr);
+
+        for (auto& el : j["notifications"]) {
+            Notification n;
+            n.name = el.value("name", "");
+            n.description = el.value("description", "");
+            n.timestamp = el.value("timestamp", "");
+
+            resp.list.push_back(n);
         }
     }
     catch (...) {}
