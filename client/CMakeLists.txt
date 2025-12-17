@@ -20,6 +20,7 @@ target_link_libraries(client
     Qt6::Widgets
     cpr::cpr
     mysql::concpp
+    nlohmann_json::nlohmann_json
 )
 
 target_include_directories(client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
