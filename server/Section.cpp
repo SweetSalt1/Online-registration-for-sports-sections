@@ -1,8 +1,8 @@
-#include <Startserver.cpp>
+#include "Section.h"
 
 class Section {
 public:
-    StartServer startserver;
+    ConnectBD startserver;
     Section(int section_id, const std::string& name, const std::string& description,
         const std::vector<int>& student_ids)
         : section_id_(section_id),
