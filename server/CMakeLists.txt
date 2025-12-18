@@ -9,11 +9,6 @@ set(SERVER_SOURCES
 
 add_executable(server ${SERVER_SOURCES})
 
-target_link_libraries(server
-    PRIVATE
-    crow
-    /usr/include/mysql-cppconn/jdbc
-)
+target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} /usr/include/mysql-cppconn/jdbc /usr/include/mysql-cppconn/jdbc)
 
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
+target_link_libraries(server PRIVATE crow mysqlcppconn)
