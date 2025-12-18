@@ -1,3 +1,6 @@
+#include <Startserver.cpp>
+
+
 class Student {
 public:
     StartServer startserver;
@@ -10,12 +13,17 @@ public:
         issued_by_(issued_by),
         date_of_issue_(date_of_issue)
     {
-        std::string query = "INSERT INTO users (student_id, full_name, issued_by, date_of_issue) VALUES ('" +
-            startserver.escapeString(student_id_) + "', '" +
-            startserver.escapeString(name_student_) + "', '" +
-            startserver.escapeString(issued_by_) + "', '" +
-            startserver.escapeString(date_of_issue_) + "')";
-        return mysql_query(connection, query.c_str()) == 0;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "INSERT INTO users (student_id, full_name, issued_by, date_of_issue) VALUES (?, ?, ?, ?)"));
+            pstmt->setString(1, student_id_);
+            pstmt->setString(2, name_student_);
+            pstmt->setString(3, issued_by_);
+            pstmt->setString(4, date_of_issue_);
+            return pstmt->executeUpdate();
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
     Student(int student_id, int section_id, const std::string& status_application,
         const std::vector<NotificationStudent>& notification,
@@ -27,11 +35,16 @@ public:
         sections_list_(sections_list),
         status_(status)
     {
-        std::string query = "INSERT INTO applications (student_id, section_id, status ENUM) VALUES ('" +
-            startserver.escapeString(student_id_) + "', '" +
-            startserver.escapeString(section_id_) + "', '" +
-            startserver.escapeString(status_application_) + "')";
-        return mysql_query(connection, query.c_str()) == 0;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "INSERT INTO applications (student_id, section_id, status ENUM) VALUES (?, ?, ?)"));
+            pstmt->setString(1, student_id_);
+            pstmt->setString(2, section_id_);
+            pstmt->setString(3, status_application_);
+            return pstmt->executeUpdate();
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
 
     bool ChangeMyData(const std::string& name_student, const std::string& study_id,
@@ -39,37 +52,64 @@ public:
         const std::string& new_name_student, const std::string& new_study_id,
         const std::string& new_issued_by, const std::string& new_date_of_issue)
     {
-        query = "UPDATE users SET full_name = '" + startserver.escapeString(new_name_student) + "' WHERE full_name = '" + startserver.escapeString(name_student) + "'";
-        mysql_query(connection, query.c_str());
-        query = "UPDATE users SET user_id = '" + startserver.escapeString(new_study_id) + "' WHERE user_id = '" + startserver.escapeString(study_id) + "'";
-        mysql_query(connection, query.c_str());
-        query = "UPDATE users SET issued_by = '" + startserver.escapeString(issued_by) + "' WHERE issued_by = '" + startserver.escapeString(issued_by) + "'";
-        mysql_query(connection, query.c_str());
-        query = "UPDATE users SET date_of_issue = '" + startserver.escapeString(new_date_of_issue) + "' WHERE date_of_issue = '" + startserver.escapeString(date_of_issue) + "'";
-        mysql_query(connection, query.c_str());
-        return mysql_query(connection, query.c_str()) == 0;
-    }
-    bool MySection(const std::string& status, const int& student_id)
-    {
-        query = "SELECT status ENUM FROM users WHERE student_id = '" + student_id.c_str() + "'";
-        if (mysql_query(connection, query.c_str()) == 0)
-        {
-            MYSQL_RES* result = mysql_store_result(connection);
-            bool exists = (mysql_num_rows(result) > 0);
-            mysql_free_result(result);
-            return exists;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "UPDATE users SET full_name = ? WHERE full_name = ?"));
+            pstmt->setString(1, new_name_student);
+            pstmt->setString(2, name_student);
+            pstmt->executeUpdate();
+            pstmt(conn->prepareStatement(
+                "UPDATE users SET user_id = ? WHERE user_id = ?"));
+            pstmt->setString(1, new_study_id);
+            pstmt->setString(2, study_id);
+            pstmt->executeUpdate();
+            pstmt(conn->prepareStatement(
+                "UPDATE users SET issued_by = ? WHERE issued_by = ?"));
+            pstmt->setString(1, new_issued_by);
+            pstmt->setString(2, issued_by);
+            pstmt->executeUpdate();
+            pstmt(conn->prepareStatement(
+                "UPDATE users SET date_of_issue = ? WHERE date_of_issue = ?"));
+            pstmt->setString(1, new_date_of_issue);
+            pstmt->setString(2, date_of_issue);
+            pstmt->executeUpdate();
+            return true;
         }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
-    bool MyApplication(const std::string& form_data, const int& student_id)
+    string MySection(const std::string status, int student_id)
+    {
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "SELECT status ENUM FROM applications WHERE student_id = ? "));
+            pstmt->setString(1, student_id);
+            std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+            if (res->next()) 
+            { 
+                std::string status_ENUM = res->getString("status ENUM");
+                return status_ENUM; 
+            }
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); }
+    }
+    bool MyApplication(const std::string& form_data, int student_id)
     {
         query = "SELECT application_id FROM applications WHERE student_id = '" + student_id.c_str() + "'";
-        if (mysql_query(connection, query.c_str()) == 0)
-        {
-            MYSQL_RES* result = mysql_store_result(connection);
-            bool exists = (mysql_num_rows(result) > 0);
-            mysql_free_result(result);
-            return exists;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "SELECT applications_id FROM applications WHERE student_id = ? "));
+            pstmt->setString(1, student_id);
+            std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+            if (res->next()) 
+            { 
+                std::string applications_id = res->getString("status ENUM");
+                return applications_id; 
+            }
         }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); }
     }
     std::string ShowSectionsList(const std::list<Section>& sections_list) const
     {
@@ -94,7 +134,6 @@ public:
         result_json += "]}";
         return result_json;
     }
-    bool GetNotification(std::vector<NotificationStudent>* notification) const;
     void Unpack(const crow::json::rvalue& json) {
         student_id_ = json["student_id"].i();
         name_student_ = json["name_student"].s();
