@@ -8,6 +8,7 @@
 #include <mutex>
 #include <queue>
 
+#include <mysql/jdbc.h>
 class StartServer()
 {
   public:
@@ -58,7 +59,7 @@ class StartServer()
   MYSQL* connection;
   sql::mysql::MySQL_Driver* driver;
   const std::string serverSQL = "tcp://127.0.0.1:3306";
-  const std::string usernameSQL = "MySQL";
-  const std::string passwordSQL = "123";
-  const std::string databaseSQL = "DataBase";
+  const std::string usernameSQL = "user";
+  const std::string passwordSQL = "12345678";
+  const std::string databaseSQL = "mybd";
 }
