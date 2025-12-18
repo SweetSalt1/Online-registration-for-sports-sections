@@ -1,4 +1,4 @@
-
+#include <Startserver.cpp>
 
 class Authentication {
 public:
@@ -20,7 +20,8 @@ public:
     {
         try {
             auto conn = startserver.getConnection();
-            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement("SELECT password FROM users WHERE login = ?"));
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "SELECT password FROM users WHERE login = ?"));
             pstmt->setString(1, login_);
             std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
             if (res->next()) 
