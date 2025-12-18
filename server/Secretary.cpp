@@ -1,11 +1,12 @@
-#include <Startserver.cpp>
+#include "Secretary.h"
 
 
 class Secretary {
 public:
     StartServer startserver;
     Secretary(const std::string& name, const std::string& applications_list)
-        : name_(name), applications_list_(applications_list) {
+        : name_(name), applications_list_(applications_list) 
+    {
     }
     std::string ShowSectionsList(const std::list<Section>& sections_list, const std::string& notification)
     {
