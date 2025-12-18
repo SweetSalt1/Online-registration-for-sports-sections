@@ -1,6 +1,10 @@
 set(SERVER_SOURCES
-    server2.h
-    server.cpp
+    Authentication.cpp
+    Secretary.cpp
+    Section.cpp
+    Startserver.cpp
+    Student.cpp
+    WorkWithJson.cpp
 )
 
 add_executable(server ${SERVER_SOURCES})
@@ -12,3 +16,4 @@ target_link_libraries(server
 )
 
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
