@@ -169,11 +169,6 @@ class StartServer
     std::thread server_thread([](){ app.port(8080).multithreaded().run();});
   }
 
-bool get_student(Student& st)
-{
-student=st.status_;
-}
 
   private:
-  std::string student;
 }
