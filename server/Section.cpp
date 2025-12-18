@@ -1,3 +1,5 @@
+#include <Startserver.cpp>
+
 class Section {
 public:
     StartServer startserver;
@@ -8,34 +10,63 @@ public:
         description_(description),
         student_ids_(student_ids)
     {
+
     }
 
-    bool ChangeDataSection(int section_id, const std::string& name, const std::string& description)
+    bool ChangeDataSection(const std::string& name_, const std::string& description_)
     {
-        std::string query = "UPDATE sections SET description_ = '" + startserver.escapeString(description) + "' WHERE section_name = '" + startserver.escapeString(name) + "'";
-        return mysql_query(connection, query.c_str()) == 0;
-    }
-    bool GetSectionInfo(int section_id, const std::string* name, const std::string* description)
-    {
-        std::string query = "SELECT description_ FROM sections WHERE section_id = '" + startserver.escapeString(section_id) + "'";
-        if (mysql_query(connection, query.c_str()) == 0)
-        {
-            MYSQL_RES* result = mysql_store_result(connection);
-            bool exists = (mysql_num_rows(result) > 0);
-            mysql_free_result(result);
-            return exists;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "UPDATE sections SET description_ = ? WHERE section_name = ?"));
+            pstmt->setString(1, name);
+            pstmt->setString(2, description_);
+            pstmt->executeUpdate();
+            return true;
         }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
+    }
+    string GetSectionInfo(int section_id, const std::string* name, const std::string* description)
+    {
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "SELECT description_ FROM sections WHERE section_id = ?"));
+            pstmt->setString(1, section_id);
+            std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+            if (res->next()) 
+            { 
+                std::string descript = res->getString("description_");
+                return descript; 
+            }
+            else { return false; }
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
     bool AddStudent(const int& student_id, const int& section_id)
     {
-        std::string query = "UPDATE users SET section_enrolled = '" + section_id.c_str() + "' WHERE user_id = '" + student_id.c_str() + "'";
-        return mysql_query(connection, query.c_str()) == 0;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "UPDATE users SET section_enrolled = ? WHERE user_id = ?"));
+            pstmt->setString(1, section_id);
+            pstmt->setString(2, student_id);
+            pstmt->executeUpdate();
+            return true;
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
     bool DeleteStudent(const int& student_id, const int& section_id)
     {
-        std::string null = "0";
-        std::string query = "UPDATE users SET section_enrolled = '" + null.c_str() + "' WHERE user_id = '" + student_id.c_str() + "'";
-        return mysql_query(connection, query.c_str()) == 0;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "DELETE section_enrolled FROM users WHERE user_id = ?"));
+            pstmt->setString(1, student_id);
+            pstmt->executeUpdate();
+            return true;
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
 
     void Unpack(const crow::json::rvalue& json) {
