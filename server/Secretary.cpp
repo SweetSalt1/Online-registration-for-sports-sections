@@ -1,3 +1,5 @@
+#include <Startserver.cpp>
+
 
 class Secretary {
 public:
@@ -53,11 +55,17 @@ public:
         std::vector<std::unique_ptr<Student>>* students);
     bool AddSectionToList(int section_id, const std::string& name, const std::string& description)
     {
-        std::string query = "INSERT INTO sections (section_id, section_name, description_) VALUES ('" +
-            startserver.escapeString(section_id) + "', '" +
-            startserver.escapeString(name) + "', '" +
-            startserver.escapeString(description) + "')";
-        return mysql_query(connection, query.c_str()) == 0;
+        std::string query = "INSERT INTO sections (section_id, section_name, description_) VALUES ('" +;
+        try {
+            auto conn = startserver.getConnection();
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "INSERT INTO sections (section_id, section_name, description) VALUES (?, ?, ?)"));
+            pstmt->setString(1, section_id_);
+            pstmt->setString(2, section_name_);
+            pstmt->setString(3, description_);
+            return pstmt->executeUpdate();
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
 
     void Unpack(const crow::json::rvalue& json) {
