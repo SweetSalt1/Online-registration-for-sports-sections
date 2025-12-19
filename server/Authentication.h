@@ -3,7 +3,7 @@
 
 class Authentication {
 public:
-    ConnectBD startserver;
+    ConnectBD startserver("tcp://127.0.0.1:3306","user","123Bd321!","mybd");
     Authentication(std::string& login, std::string& password,std::string& role,std::string& new_password);
     bool RegistrationUser(const std::string& login_, const std::string& password_, const std::string& role_);
     bool SignUser(const std::string& login_, const std::string& password_);
