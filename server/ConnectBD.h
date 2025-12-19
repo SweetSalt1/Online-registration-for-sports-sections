@@ -19,10 +19,10 @@ class ConnectBD
     
     private:
     sql::mysql::MySQL_Driver* driver;
-    const std::string serverSQL;
-    const std::string usernameSQL;
-    const std::string passwordSQL;
-    const std::string databaseSQL;
+    const std::string serverSQL_;
+    const std::string usernameSQL_;
+    const std::string passwordSQL_;
+    const std::string databaseSQL_;
 
     std::string serverSQL;
     std::string usernameSQL;
