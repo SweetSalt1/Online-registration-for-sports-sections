@@ -1,29 +1,25 @@
 #include "Startserver.h"
 #include "crow.h"
-class StartServer
-{
+class StartServer {
   public:
   crow::SimpleApp app;
-    StartServer(int port_)
-    {
-      try
-      {
+    StartServer(int port_) {
+      try {
         port=port_;
       }
-      catch (...)
-      {port=8080}
+      catch (...) {
+        port=8080;
+      }
     }
 
-  void Start_server()
-  {
+  void Start_server() {
     std::cout<< "Server running at http://localhost:8080" << std::endl;
     std::thread server_thread([](){ app.port(8080).multithreaded().run();});
   }
 
     CROW_ROUTE(app, "/register").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
             
             if (!json || !json.has("login") || !json.has("password")) 
@@ -37,78 +33,88 @@ class StartServer
               {return crow::response(201, "User created"); } 
             else { return crow::response(409, "User exists"); }
         } 
-        catch (const std::exception& e) 
-            {return crow::response(500, "Server error");}
+        catch (const std::exception& e) {
+          return crow::response(500, "Server error");
+        }
     });
     
     CROW_ROUTE(app, "/login").methods("POST"_method)
     ([](const crow::request& req) {
-      try
-      {
+      try {
         auto json = crow::json::load(req.body);
 
         std::string login = json["login"].s();
         std::string password = json["password"].s();
         
-        if (auth.SignUser(login, password)) 
-        { return crow::response(200, "Login successful"); } 
-        else { return crow::response(401, "Invalid credentials"); }
+        if (auth.SignUser(login, password)) { 
+          return crow::response(200, "Login successful"); 
+        } 
+        else { 
+          return crow::response(401, "Invalid credentials"); 
+        }
       }
-      catch (const std::exception& e) 
-            {return crow::response(500, "Server error");}
+      catch (const std::exception& e) {
+        return crow::response(500, "Server error");
+      }
     });
 
     CROW_ROUTE(app, "/replace/password").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
             
-            if (!json || !json.has("login") || !json.has("password")) 
-              {return crow::response(400, "Invalid JSON");}
+            if (!json || !json.has("login") || !json.has("password")) {
+              return crow::response(400, "Invalid JSON");
+            }
             
             std::string login = json["login"].s();
             std::string password = json["password"].s();
             std::string new_password = json["new_password"].s();
 
-            if (auth.Replaceinfo(login, password, new_password)) 
-              {return crow::response(201, "User created"); } 
-            else { return crow::response(409, "User exists"); }
+            if (auth.Replaceinfo(login, password, new_password)) {
+              return crow::response(201, "User created"); 
+            } 
+            else { 
+              return crow::response(409, "User exists"); 
+            }
         } 
-        catch (const std::exception& e) 
-            {return crow::response(500, "Server error");}
+        catch (const std::exception& e) {
+          return crow::response(500, "Server error");
+        }
     });
 
     CROW_ROUTE(app, "/delete/user").methods("POST"_method)
     ([](const crow::request& req) {
-      try
-      {
+      try {
         auto json = crow::json::load(req.body);
 
         std::string login = json["login"].s();
         
-        if (auth.DeleteUser(login)) 
-        { return crow::response(200, "Delete successful"); } 
-        else { return crow::response(401, "Invalid credentials"); }
+        if (auth.DeleteUser(login)) { 
+          return crow::response(200, "Delete successful"); 
+        } 
+        else { 
+          return crow::response(401, "Invalid credentials"); 
+        }
       }
-      catch (const std::exception& e) 
-            {return crow::response(500, "Server error");}
+      catch (const std::exception& e) {
+        return crow::response(500, "Server error");
+      }
     });
 
     CROW_ROUTE(app, "/get/users/all")
     ([]() {
-      try
-      {    
+      try {    
          return crow::response(200, auth.GetAllUsers());  
       }
-      catch (const std::exception& e) 
-            {return crow::response(500, "Server error");}
+      catch (const std::exception& e) {
+        return crow::response(500, "Server error");
+      }
     });
 
    /* CROW_ROUTE(app, "/insert/information/student").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
 
             std::string student_id = json["student_id"].s();
@@ -126,8 +132,7 @@ class StartServer
 
     CROW_ROUTE(app, "/insert/application/student").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
 
             std::string student_id = json["student_id"].s();
@@ -144,8 +149,7 @@ class StartServer
     
     CROW_ROUTE(app, "/get/section/student").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
 
             std::string student_id = json["student_id"].s();
@@ -159,8 +163,7 @@ class StartServer
 
     CROW_ROUTE(app, "/get/myapplication/student").methods("POST"_method)
     ([](const crow::request& req) {
-        try 
-        {
+        try {
             auto json = crow::json::load(req.body);
 
             std::string student_id = json["student_id"].s();
