@@ -1,16 +1,22 @@
-#include <crow.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <Authentication.cpp>
-#include <Student.cpp>
+#include "Startserver.h"
+#include "crow.h"
 class StartServer
 {
   public:
-  Authentication auth;
-  Student student;
+  Authentication auth("user","123","Secretary","321");
+  Student student(1);
 
   crow::SimpleApp app;
+
+    StartServer(int port_)
+    {
+      try
+      {
+        port=port_;
+      }
+      catch (...)
+      {port=8080}
+    }
 
   crow::response HandleJSONRequest(const crow::request& req) {
         auto json = crow::json::load(req.body);
@@ -168,7 +174,6 @@ class StartServer
     std::cout<< "Server running at http://localhost:8080" << std::endl;
     std::thread server_thread([](){ app.port(8080).multithreaded().run();});
   }
-
-
   private:
+  int port;
 }
