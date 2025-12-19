@@ -1,39 +1,30 @@
-#include <Startserver.cpp>
-
+#include "Student.h"
 
 class Student {
 public:
-    StartServer startserver;
-    Student(int student_id, const std::string& name_student,
+    ConnectBD startserver("tcp://127.0.0.1:3306","user","123Bd321!","mybd");
+    Student(int student_id)
+    {
+        student_id_=student_id;
+    }
+    bool InsertStudentInformation(int student_id, const std::string& name_student,
         const std::string& study_id, const std::string& issued_by,
         const std::string& date_of_issue)
-        : student_id_(student_id),
-        name_student_(name_student),
-        study_id_(study_id),
-        issued_by_(issued_by),
-        date_of_issue_(date_of_issue)
     {
         try {
             auto conn = startserver.getConnection();
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-                "INSERT INTO users (student_id, full_name, issued_by, date_of_issue) VALUES (?, ?, ?, ?)"));
-            pstmt->setString(1, student_id_);
-            pstmt->setString(2, name_student_);
-            pstmt->setString(3, issued_by_);
-            pstmt->setString(4, date_of_issue_);
+                "INSERT INTO users (full_name, issued_by, date_of_issue) WHERE student_id = ? VALUES (?, ?, ?)"));
+            pstmt->setString(1, student_id);
+            pstmt->setString(2, name_student);
+            pstmt->setString(3, issued_by);
+            pstmt->setString(4, date_of_issue);
             return pstmt->executeUpdate();
         }
         catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
-    Student(int student_id, int section_id, const std::string& status_application,
-        const std::vector<NotificationStudent>& notification,
-        const std::string& sections_list, const std::string& status)
-        : student_id_(student_id),
-        section_id_(section_id),
-        status_application_(status_application),
-        notification_(notification),
-        sections_list_(sections_list),
-        status_(status)
+
+    bool InsertStudentApplication(int student_id, int section_id, const std::string& status_application)
     {
         try {
             auto conn = startserver.getConnection();
@@ -78,7 +69,8 @@ public:
         }
         catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
     }
-    string MySection(const std::string status, int student_id)
+
+    std::string MySection(int student_id)
     {
         try {
             auto conn = startserver.getConnection();
@@ -94,9 +86,9 @@ public:
         }
         catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); }
     }
-    bool MyApplication(const std::string& form_data, int student_id)
+
+    std:string MyApplication(int student_id)
     {
-        query = "SELECT application_id FROM applications WHERE student_id = '" + student_id.c_str() + "'";
         try {
             auto conn = startserver.getConnection();
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
@@ -113,9 +105,11 @@ public:
     }
     std::string ShowSectionsList(const std::list<Section>& sections_list) const
     {
+        try
+        {   
         query = "SELECT section_name, trainer, description_, FROM sections";
         std::string result_json = "{\"sections\":[";
-        if (mysql_query(connection, query.c_str()) == 0)
+        if (mysql_query(connection, std::string(query)) == 0)
         {
             MYSQL_RES* result = mysql_store_result(connection);
             MYSQL_ROW row;
@@ -133,7 +127,10 @@ public:
         }
         result_json += "]}";
         return result_json;
+        }
+        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); }
     }
+
     void Unpack(const crow::json::rvalue& json) {
         student_id_ = json["student_id"].i();
         name_student_ = json["name_student"].s();
@@ -178,7 +175,8 @@ public:
 
 private:
     std::string query;
-    int student_id_;
+
+    int student_id_=1;
     std::string name_student_;
     std::string study_id_;
     std::string issued_by_;
