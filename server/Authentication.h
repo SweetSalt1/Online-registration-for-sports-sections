@@ -17,5 +17,5 @@ private:
     std::string password_;
     std::string role_;
     std::string new_password_;
-    int student_id_=1;
+    int student_id_ = 1;
 };
