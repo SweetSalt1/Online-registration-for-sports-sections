@@ -1,17 +1,19 @@
-#include <crow.h>
-#include <iostream>
-#include <string>
-#include <vector>
+#pragma once
+
 #include "Authentication.h"
 #include "Student.h"
-
+#include "Secretary.h"
+#include "Session.h"
 class StartServer
 {
   public:
-  Authentication auth;
-  Student student;
+  Authentication auth("user","123","Secretary","321");
+  Student student(1);
 
   crow::SimpleApp app;
+
+
+  StartServer(int port_);
 
   crow::response HandleJSONRequest(const crow::request& req);
       
@@ -40,5 +42,5 @@ class StartServer
   void Start_server();
 
   private:
-  std::string student;
+  int port;
 }
