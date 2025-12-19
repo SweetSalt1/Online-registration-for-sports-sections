@@ -1,0 +1,21 @@
+# Используем официальный образ C++
+FROM gcc:latest
+
+# Устанавливаем зависимости для crow и mysql
+RUN apt-get update && \
+    apt-get install -y cmake libmysqlcppconn-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Копируем исходный код проекта
+WORKDIR /app
+COPY . .
+
+# Собираем проект
+RUN mkdir build && \
+    cd build && \
+    cmake .. && \
+    make
+
+# Указываем команду для запуска сервера в тестовом режиме
+# (Вам нужно будет добавить флаг/конфиг для использования тестовой БД)
+CMD ["./build/your_server_executable_name"] 
