@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  test-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: test_sports_db
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    ports:
+      - "3307:3306" # Промаппим порт, чтобы не конфликтовать с локальной БД
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  test-backend:
+    build:
+      context: . # Собираем из корня проекта
+      dockerfile: Dockerfile.test # Специальный Dockerfile для тестов
+    environment:
+      DATABASE_HOST: test-db
+      DATABASE_USER: test_user
+      DATABASE_PASSWORD: test_password
+      DATABASE_NAME: test_sports_db
+    ports:
+      - "18081:8081" # Crow слушает на 8081
+    depends_on:
+      test-db:
+        condition: service_healthy
