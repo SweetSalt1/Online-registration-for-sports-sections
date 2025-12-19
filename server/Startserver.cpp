@@ -3,11 +3,7 @@
 class StartServer
 {
   public:
-  Authentication auth("user","123","Secretary","321");
-  Student student(1);
-
   crow::SimpleApp app;
-
     StartServer(int port_)
     {
       try
@@ -18,30 +14,11 @@ class StartServer
       {port=8080}
     }
 
-  crow::response HandleJSONRequest(const crow::request& req) {
-        auto json = crow::json::load(req.body);
-        if (!json) {
-            return crow::response(400, "Invalid JSON");
-        }
-
-        std::string action;
-        if (json.has("action")) {
-            action = json["action"].s();
-        }
-
-        if (action == "register") {
-            std::string login = json["login"].s();
-            std::string password = json["password"].s();
-            std::string role = json["role"].s();
-
-            crow::json::wvalue response;
-            response["success"] = true;
-            response["message"] = "User registered successfully";
-            return crow::response(response);
-        }
-
-        return crow::response(404, "Action not found");
-    }
+  void Start_server()
+  {
+    std::cout<< "Server running at http://localhost:8080" << std::endl;
+    std::thread server_thread([](){ app.port(8080).multithreaded().run();});
+  }
 
     CROW_ROUTE(app, "/register").methods("POST"_method)
     ([](const crow::request& req) {
@@ -102,7 +79,33 @@ class StartServer
             {return crow::response(500, "Server error");}
     });
 
-    CROW_ROUTE(app, "/insert/information/student").methods("POST"_method)
+    CROW_ROUTE(app, "/delete/user").methods("POST"_method)
+    ([](const crow::request& req) {
+      try
+      {
+        auto json = crow::json::load(req.body);
+
+        std::string login = json["login"].s();
+        
+        if (auth.DeleteUser(login)) 
+        { return crow::response(200, "Delete successful"); } 
+        else { return crow::response(401, "Invalid credentials"); }
+      }
+      catch (const std::exception& e) 
+            {return crow::response(500, "Server error");}
+    });
+
+    CROW_ROUTE(app, "/get/users/all")
+    ([]() {
+      try
+      {    
+         return crow::response(200, auth.GetAllUsers());  
+      }
+      catch (const std::exception& e) 
+            {return crow::response(500, "Server error");}
+    });
+
+   /* CROW_ROUTE(app, "/insert/information/student").methods("POST"_method)
     ([](const crow::request& req) {
         try 
         {
@@ -167,13 +170,32 @@ class StartServer
         } 
         catch (const std::exception& e) 
             {return crow::response(500, "Server error");}
-    });
+    });*/
+     /* crow::response HandleJSONRequest(const crow::request& req) {
+        auto json = crow::json::load(req.body);
+        if (!json) {
+            return crow::response(400, "Invalid JSON");
+        }
 
-  void Start_server()
-  {
-    std::cout<< "Server running at http://localhost:8080" << std::endl;
-    std::thread server_thread([](){ app.port(8080).multithreaded().run();});
-  }
+        std::string action;
+        if (json.has("action")) {
+            action = json["action"].s();
+        }
+
+        if (action == "register") {
+            std::string login = json["login"].s();
+            std::string password = json["password"].s();
+            std::string role = json["role"].s();
+
+            crow::json::wvalue response;
+            response["success"] = true;
+            response["message"] = "User registered successfully";
+            return crow::response(response);
+        }
+
+        return crow::response(404, "Action not found");
+    }*/
+   
   private:
   int port;
 }
