@@ -3,23 +3,26 @@
 
 using json = nlohmann::json;
 
-//  PACK 
+// PACK
 
-std::string JSONTool::PackRegister(const std::string& login, const std::string& password) {
+std::string JSONTool::PackRegister(const std::string& login,
+    const std::string& password) {
     json j;
     j["login"] = login;
     j["password"] = password;
     return j.dump();
 }
 
-std::string JSONTool::PackLogin(const std::string& login, const std::string& password) {
+std::string JSONTool::PackLogin(const std::string& login,
+    const std::string& password) {
     json j;
     j["login"] = login;
     j["password"] = password;
     return j.dump();
 }
 
-std::string JSONTool::PackApplication(const std::string& token, int section_id, const std::string& text) {
+std::string JSONTool::PackApplication(const std::string& token, int section_id,
+    const std::string& text) {
     json j;
     j["token"] = token;
     j["section_id"] = section_id;
@@ -27,7 +30,8 @@ std::string JSONTool::PackApplication(const std::string& token, int section_id, 
     return j.dump();
 }
 
-std::string JSONTool::PackModeration(const std::string& token, int student_id, bool approve) {
+std::string JSONTool::PackModeration(const std::string& token, int student_id,
+    bool approve) {
     json j;
     j["token"] = token;
     j["student_id"] = student_id;
@@ -35,11 +39,11 @@ std::string JSONTool::PackModeration(const std::string& token, int student_id, b
     return j.dump();
 }
 
-//  UNPACK 
+// UNPACK
 
-bool JSONTool::UnpackSimpleSuccess(const std::string& jsonStr) {
+bool JSONTool::UnpackSimpleSuccess(const std::string& json_str) {
     try {
-        auto j = json::parse(jsonStr);
+        auto j = json::parse(json_str);
         return j.value("success", false);
     }
     catch (...) {
@@ -47,11 +51,11 @@ bool JSONTool::UnpackSimpleSuccess(const std::string& jsonStr) {
     }
 }
 
-LoginResponse JSONTool::UnpackLoginResponse(const std::string& jsonStr) {
+LoginResponse JSONTool::UnpackLoginResponse(const std::string& json_str) {
     LoginResponse r;
 
     try {
-        auto j = json::parse(jsonStr);
+        auto j = json::parse(json_str);
         r.success = j.value("success", false);
         r.token = j.value("token", "");
         r.role = j.value("role", "");
@@ -65,14 +69,13 @@ LoginResponse JSONTool::UnpackLoginResponse(const std::string& jsonStr) {
     return r;
 }
 
-SectionsResponse JSONTool::UnpackSections(const std::string& jsonStr) {
+SectionsResponse JSONTool::UnpackSections(const std::string& json_str) {
     SectionsResponse resp;
 
     try {
-        auto j = json::parse(jsonStr);
+        auto j = json::parse(json_str);
 
-        if (!j.contains("sections") || !j["sections"].is_array())
-            return resp;
+        if (!j.contains("sections") || !j["sections"].is_array()) return resp;
 
         for (auto& el : j["sections"]) {
             SectionInfo s;
@@ -82,19 +85,19 @@ SectionsResponse JSONTool::UnpackSections(const std::string& jsonStr) {
             resp.sections.push_back(s);
         }
     }
-    catch (...) {}
+    catch (...) {
+    }
 
     return resp;
 }
 
-QueueResponse JSONTool::UnpackQueue(const std::string& jsonStr) {
+QueueResponse JSONTool::UnpackQueue(const std::string& json_str) {
     QueueResponse resp;
 
     try {
-        auto j = json::parse(jsonStr);
+        auto j = json::parse(json_str);
 
-        if (!j.contains("queue") || !j["queue"].is_array())
-            return resp;
+        if (!j.contains("queue") || !j["queue"].is_array()) return resp;
 
         for (auto& el : j["queue"]) {
             QueueItem q;
@@ -105,16 +108,18 @@ QueueResponse JSONTool::UnpackQueue(const std::string& jsonStr) {
             resp.list.push_back(q);
         }
     }
-    catch (...) {}
+    catch (...) {
+    }
 
     return resp;
 }
 
-NotificationsResponse JSONTool::UnpackNotifications(const std::string& jsonStr) {
+NotificationsResponse JSONTool::UnpackNotifications(
+    const std::string& json_str) {
     NotificationsResponse resp;
 
     try {
-        auto j = nlohmann::json::parse(jsonStr);
+        auto j = nlohmann::json::parse(json_str);
 
         for (auto& el : j["notifications"]) {
             Notification n;
@@ -125,7 +130,8 @@ NotificationsResponse JSONTool::UnpackNotifications(const std::string& jsonStr) 
             resp.list.push_back(n);
         }
     }
-    catch (...) {}
+    catch (...) {
+    }
 
     return resp;
 }

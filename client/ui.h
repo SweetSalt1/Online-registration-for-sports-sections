@@ -1,19 +1,22 @@
-#pragma once
+#ifndef UI_H
+#define UI_H
+
 #include "api.h"
 #include "session.h"
 
 class UI {
 public:
-    UI(API& api, Session& session)
-        : api_(api), session_(session) {}
+	UI(API& api, Session& session) : api_(api), session_(session) {}
 
-    void MainMenu();
+	void MainMenu();
 
 private:
-    void MenuGuest();
-    void MenuStudent();
-    void MenuSecretary();
+	void MenuGuest();
+	void MenuStudent();
+	void MenuSecretary();
 
-    API& api_;
-    Session& session_;
+	API& api_;
+	Session& session_;
 };
+
+#endif  

@@ -1,25 +1,29 @@
-#pragma once
+#ifndef API_H
+#define API_H
+
 #include <string>
 #include "types.h"
 #include "session.h"
 
 class API {
 public:
-    explicit API(Session& session) : session_(session) {}
+	explicit API(Session& session) : session_(session) {}
 
-    bool Register(const std::string& login, const std::string& password);
-    bool Login(const std::string& login, const std::string& password);
+	bool Register(const std::string& login, const std::string& password);
+	bool Login(const std::string& login, const std::string& password);
 
-    SectionsResponse GetSections();
-    bool SendApplication(int section_id, const std::string& text);
+	SectionsResponse GetSections();
+	bool SendApplication(int section_id, const std::string& text);
 
-    QueueResponse GetQueue();
-    bool Moderate(int student_id, bool approve);
+	QueueResponse GetQueue();
+	bool Moderate(int student_id, bool approve);
 
 private:
-    std::string Post(const std::string& url, const std::string& body);
-    std::string Get(const std::string& url);
-    const std::string BASE_URL = "127.0.01::8080";
+	std::string Post(const std::string& url, const std::string& body);
+	std::string Get(const std::string& url);
+	const std::string BASE_URL = "127.0.01::8080";
 
-    Session& session_;
+	Session& session_;
 };
+
+#endif  
