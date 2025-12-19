@@ -1,3 +1,10 @@
+#pragma once
+
+#include <string>
+#include <vector>
+#include <list>
+#include <ctime>
+#include <crow/json.h>
 
 struct SectionInfo {
     int id;
@@ -28,13 +35,19 @@ struct SectionsResponse {
 
 class JSONTool {
 public:
-    static std::string PackRegister(const std::string& login, const std::string& password);
+    static std::string PackRegister(const std::string& login,
+                                    const std::string& password);
 
-    static std::string PackLogin(const std::string& login, const std::string& password);
+    static std::string PackLogin(const std::string& login,
+                                 const std::string& password);
 
-    static std::string PackApplication(const std::string& token, int section_id, const std::string& text);
+    static std::string PackApplication(const std::string& token,
+                                       int section_id,
+                                       const std::string& text);
 
-    static std::string PackModeration(const std::string& token, int student_id, bool approve);
+    static std::string PackModeration(const std::string& token,
+                                      int student_id,
+                                      bool approve);
 
     static bool UnpackSimpleSuccess(const std::string& jsonStr);
 
@@ -42,7 +55,7 @@ public:
 
     static SectionsResponse UnpackSections(const std::string& jsonStr);
 
-    static QueueResponse UnpackQueue(const std::string& jsonStr) ;
+    static QueueResponse UnpackQueue(const std::string& jsonStr);
 };
 
 struct Session {
@@ -57,6 +70,5 @@ struct NotificationStudent {
     std::string description;
 
     void Unpack(const crow::json::rvalue& json);
-
     crow::json::wvalue Pack() const;
 };
