@@ -1,6 +1,10 @@
+#pragma once
+#include "ConnectBD.h"
+
 class Authentication {
 public:
     ConnectBD startserver;
+    Authentication(std::string& login, std::string& password,std::string& role,std::string& new_password);
     bool RegistrationUser(const std::string& login_, const std::string& password_, const std::string& role_);
     bool SignUser(const std::string& login_, const std::string& password_);
 
@@ -14,5 +18,6 @@ private:
     std::string login_;
     std::string password_;
     std::string role_;
+    std::string new_password;
     int student_id_=1;
 };
