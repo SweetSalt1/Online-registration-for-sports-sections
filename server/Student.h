@@ -1,8 +1,11 @@
-#include "Student.h"
+#pragma once
+#include "ConnectBD.h"
 
 class Student {
 public:
-    ConnectBD startserver;
+    ConnectBD startserver("tcp://127.0.0.1:3306","user","123Bd321!","mybd");
+
+    Student(int student_id);
 
     bool InsertStudentInformation(int student_id, const std::string& name_student,
         const std::string& study_id, const std::string& issued_by,
