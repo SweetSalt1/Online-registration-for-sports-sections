@@ -2,15 +2,14 @@
 #include "crow.h"
 class Authentication {
 public:
-    Authentication(std::string& login, std::string& password,std::string& role,std::string& new_password)
-    {
-        login_=login;
-        password_=password_;
-        role_=role;
-        new_password_=new_password;
+    Authentication(std::string& login, std::string& password,
+        std::string& role,std::string& new_password) {
+        login_ = login;
+        password_ = password;
+        role_ = role;
+        new_password_ = new_password;
     }
-    bool RegistrationUser(const std::string& login, const std::string& password, const std::string& role)
-    {
+    bool RegistrationUser(const std::string& login, const std::string& password, const std::string& role) {
         try {
             auto conn = startserver.getConnection();
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
@@ -25,26 +24,32 @@ public:
             delete pstmt;
             delete conn;
         }
-        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
+        catch (sql::SQLException& e) { 
+            CROW_LOG_ERROR << "MySQL Error: " << e.what(); 
+            return false; 
+        }
     }
-    bool SignUser(const std::string& login, const std::string& password)
-    {
+    bool SignUser(const std::string& login, const std::string& password) {
         try {
             auto conn = startserver.getConnection();
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "SELECT password FROM users WHERE email = ?"));
             pstmt->setString(1, login);
             std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-            if (res->next()) 
-            { 
+            if (res->next()) { 
                 std::string storedPassword = res->getString("password");
                 return storedPassword == password; 
             }
-            else { return false; }
+            else { 
+                return false; 
+            }
             delete pstmt;
             delete conn;
         }
-        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
+        catch (sql::SQLException& e) { 
+            CROW_LOG_ERROR << "MySQL Error: " << e.what(); 
+            return false; 
+        }
     }
 
     bool ReplaceInfo(const std::string& login, const std::string& password, const std::string& new_password)
@@ -55,11 +60,9 @@ public:
                 "SELECT password FROM users WHERE email = ?"));
             pstmt->setString(1, login_);
             std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-            if (res->next()) 
-            { 
+            if (res->next()) { 
                 std::string storedPassword = res->getString("password");
-                if(storedPassword == password)
-                {
+                if(storedPassword == password) {
                     pstmt(conn->prepareStatement("UPDATE users SET password = ? WHERE email = ?"));
                     pstmt->setString(1, new_password);
                     pstmt->setString(2, login);
@@ -72,13 +75,14 @@ public:
             }
             else return false;
         }
-        catch (sql::SQLException& e) { CROW_LOG_ERROR << "MySQL Error: " << e.what(); return false; }
+        catch (sql::SQLException& e) { 
+            CROW_LOG_ERROR << "MySQL Error: " << e.what(); 
+            return false; 
+        }
     }
     
-    bool DeleteUser(const std::string&login)
-    {
-        try
-        {
+    bool DeleteUser(const std::string&login) {
+        try {
             auto conn = startserver.getConnection();
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "DELETE FROM users WHERE email = ?"));
@@ -88,28 +92,22 @@ public:
             delete pstmt;
             delete conn;
         }
-        catch(const std::exception& e)
-        {
+        catch(const std::exception& e) {
             std::cerr << e.what() << '\n';
             return false;
-        }
-        
+        }  
     }
 
-    crow::json::wvalue GetAllUsers()
-    {
-        try
-        {
+    crow::json::wvalue GetAllUsers() {
+        try {
             auto conn = startserver.getConnection();
             sql::Statement* pstmt = conn->createStatement();
             sql::ResultSet* res = pstmt->executeQuery(
                 "SELECT user_id, email, role FROM users WHERE is_deleted = 0");
             crow::json::wvalue response;
             response["success"] = true;
-            
             int i = 0;
-            while (res->next()) 
-            {
+            while (res->next()) {
                 response["users"][i]["user_id"] = res->getInt("user_id");
                 response["users"][i]["login"] = res->getString("email");
                 response["users"][i]["role"] = res->getString("role");
@@ -120,10 +118,8 @@ public:
             delete pstmt;
             delete conn;
             return response;
-            
         } 
-        catch (sql::SQLException& e) 
-        {
+        catch (sql::SQLException& e) {
             crow::json::wvalue error_response;
             error_response["success"] = false;
             error_response["error"] = e.what();
