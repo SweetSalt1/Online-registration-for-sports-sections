@@ -1,4 +1,3 @@
-// server.cpp
 #include "server.h"
 #include <iostream>
 #include <syslog.h>
@@ -7,7 +6,6 @@ Server::Server() : db(), sessionManager(db), authManager(db) {
     openlog("SportServer", LOG_PID | LOG_CONS, LOG_USER);
     syslog(LOG_INFO, "Сервер запускается...");
 
-    // Очищаем старые сессии при старте
     sessionManager.cleanupOldSessions();
 
     setupRoutes();
@@ -136,21 +134,17 @@ void Server::setupRoutes() {
         int sectionId = json["section_id"].i();
         std::string text = json["text"].s();
 
-        // Проверяем токен и получаем ID пользователя
         int userId;
         std::string role;
         if (!sessionManager.validateSession(token, userId, role)) {
             syslog(LOG_WARNING, "Недействительный токен при подаче заявки");
             return crow::response(401, "Invalid or expired token");
         }
-
-        // Проверяем, что пользователь студент
         if (role != "student") {
             syslog(LOG_WARNING, "Попытка подачи заявки не студентом (ID: %d)", userId);
             return crow::response(403, "Only students can apply");
         }
 
-        // Проверяем, не подавал ли уже заявку на эту секцию
         try {
             std::unique_ptr<sql::PreparedStatement> checkStmt(db.getConnection()->prepareStatement(
                 "SELECT application_id FROM applications "
@@ -168,7 +162,6 @@ void Server::setupRoutes() {
                 return crow::response(response);
             }
 
-            // Создаем заявку
             std::unique_ptr<sql::PreparedStatement> pstmt(db.getConnection()->prepareStatement(
                 "INSERT INTO applications (student_id, section_id, text, status) "
                 "VALUES (?, ?, ?, 'pending')"
@@ -211,7 +204,6 @@ void Server::setupRoutes() {
             return crow::response(401, "Invalid or expired token");
         }
 
-        // Только секретарь может видеть очередь
         if (role != "secretary") {
             syslog(LOG_WARNING, "Попытка просмотра очереди не секретарем (ID: %d)", userId);
             return crow::response(403, "Access denied");
@@ -263,10 +255,9 @@ void Server::setupRoutes() {
         }
 
         std::string token = json["token"].s();
-        int applicationId = json["application_id"].i(); // Исправлено: теперь по ID заявки
+        int applicationId = json["application_id"].i();
         bool approve = json["approve"].b();
 
-        // Проверяем токен
         int userId;
         std::string role;
         if (!sessionManager.validateSession(token, userId, role)) {
@@ -274,7 +265,6 @@ void Server::setupRoutes() {
             return crow::response(401, "Invalid or expired token");
         }
 
-        // Только секретарь может модерировать
         if (role != "secretary") {
             syslog(LOG_WARNING, "Попытка модерации не секретарем (ID: %d)", userId);
             return crow::response(403, "Access denied");
@@ -312,7 +302,6 @@ void Server::setupRoutes() {
             int affectedRows = pstmt->executeUpdate();
 
             if (approve && affectedRows > 0) {
-                // Проверяем, есть ли место в секции
                 std::unique_ptr<sql::PreparedStatement> checkCapacityStmt(db.getConnection()->prepareStatement(
                     "SELECT current_students, max_students FROM sections WHERE section_id = ?"
                     ));
@@ -324,14 +313,12 @@ void Server::setupRoutes() {
                     int max = capacityRes->getInt("max_students");
 
                     if (current < max) {
-                        // Обновляем количество студентов в секции
                         std::unique_ptr<sql::PreparedStatement> updateSectionStmt(db.getConnection()->prepareStatement(
                             "UPDATE sections SET current_students = current_students + 1 WHERE section_id = ?"
                             ));
                         updateSectionStmt->setInt(1, sectionId);
                         updateSectionStmt->executeUpdate();
 
-                        // Записываем студента в секцию
                         std::unique_ptr<sql::PreparedStatement> updateUserStmt(db.getConnection()->prepareStatement(
                             "UPDATE users SET section_enrolled = ? WHERE user_id = ?"
                             ));
