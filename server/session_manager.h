@@ -1,4 +1,3 @@
-// session_manager.h
 #ifndef SESSION_MANAGER_H
 #define SESSION_MANAGER_H
 
@@ -17,4 +16,4 @@ public:
     void cleanupOldSessions();
 };
 
-#endif // SESSION_MANAGER_H
+#endif
