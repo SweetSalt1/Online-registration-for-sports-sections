@@ -1,4 +1,3 @@
-// main.cpp
 #include "server.h"
 #include <iostream>
 #include <syslog.h>
