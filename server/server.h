@@ -21,4 +21,4 @@ private:
     void setupRoutes();
 };
 
-#endif // SERVER_H
+#endif
