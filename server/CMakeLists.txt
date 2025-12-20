@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 cmake_minimum_required(VERSION 3.10)
 project(SportServer)
 
@@ -35,3 +36,56 @@ target_link_libraries(sport_server
     pthread
     mysqlcppconn
 )
+=======
+# cmake для сервера
+file(GLOB_RECURSE SERVER_SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx
+	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
+)
+
+file(GLOB_RECURSE SERVER_HEADERS
+	${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+)
+
+add_executable(server_app
+	${SERVER_SOURCES}
+	${SERVER_HEADERS}
+)
+
+set_target_properties(server_app PROPERTIES
+	OUTPUT_NAME "server"
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
+target_include_directories(server_app PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Подключаем библиотеки для сервера
+target_link_libraries(server_app PRIVATE
+	linbraries_all
+)
+
+target_compile_features(server_app PRIVATE cxx_std_17)
+
+if(MSVC)
+	target_compile_options(server_app PRIVATE /W4 /WX)
+else()
+	target_compile_options(server_app PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+if(NOT CROW_FOUND)
+	message(WARNING "Сервер требует Crow (он не найден)")
+endif()
+
+#if(NOT MYSQL_CONNECTOR_FOUND)
+#	message(WARNING "Сервер требует MySQL Connector (он не найден)")
+#endif()
+
+#if(NOT MySQL_FOUND)
+#	message(WARNING "Сервер требует MySQL client (он не найден)")
+#endif()
+>>>>>>> be0b338162bd95eb542f2c5cd77c708fde8e5d2b
