@@ -1,4 +1,3 @@
-// database.cpp
 #include </usr/include/mysql-cppconn/jdbc/mysql_driver.h>
 
 #include "database.h"
