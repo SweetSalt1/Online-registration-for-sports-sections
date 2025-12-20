@@ -1,4 +1,3 @@
-// database.h
 #ifndef DATABASE_H
 #define DATABASE_H
 
@@ -18,4 +17,4 @@ public:
     sql::Connection* getConnection();
 };
 
-#endif // DATABASE_H
+#endif
