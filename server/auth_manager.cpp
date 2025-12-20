@@ -1,4 +1,3 @@
-// auth_manager.cpp
 #include "auth_manager.h"
 #include "session_manager.h"
 #include <iostream>
@@ -11,7 +10,6 @@ bool AuthManager::registerUser(const std::string& email, const std::string& pass
     try {
         syslog(LOG_INFO, "Попытка регистрации пользователя: %s", email.c_str());
 
-        // Проверяем, не существует ли уже пользователь
         std::unique_ptr<sql::PreparedStatement> checkStmt(db.getConnection()->prepareStatement(
             "SELECT user_id FROM users WHERE email = ?"
         ));
@@ -20,15 +18,14 @@ bool AuthManager::registerUser(const std::string& email, const std::string& pass
 
         if (res->next()) {
             syslog(LOG_WARNING, "Пользователь %s уже существует", email.c_str());
-            return false; // Пользователь уже существует
+            return false;
         }
 
-        // БЕЗ ХЕШИРОВАНИЯ: сохраняем пароль как есть
         std::unique_ptr<sql::PreparedStatement> pstmt(db.getConnection()->prepareStatement(
             "INSERT INTO users (email, password, full_name, role) VALUES (?, ?, ?, ?)"
         ));
         pstmt->setString(1, email);
-        pstmt->setString(2, password); // Пароль без хеширования
+        pstmt->setString(2, password);
         pstmt->setString(3, fullName);
         pstmt->setString(4, role);
         pstmt->executeUpdate();
@@ -56,12 +53,10 @@ bool AuthManager::loginUser(const std::string& email, const std::string& passwor
         if (res->next()) {
             std::string storedPassword = res->getString("password");
 
-            // ПРЯМОЕ СРАВНЕНИЕ ПАРОЛЕЙ (без хеширования)
             if (password == storedPassword) {
                 userId = res->getInt("user_id");
                 role = res->getString("role");
 
-                // Создаем сессию
                 SessionManager sessionManager(db);
                 token = sessionManager.createSession(userId);
 
