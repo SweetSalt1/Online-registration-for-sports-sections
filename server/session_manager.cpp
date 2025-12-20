@@ -1,4 +1,3 @@
-// session_manager.cpp
 #include "session_manager.h"
 #include <random>
 #include <iostream>
