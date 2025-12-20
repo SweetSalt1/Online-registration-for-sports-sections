@@ -4,7 +4,6 @@
 #include <cpr/cpr.h>
 #include <iostream>
 
-// Базовый URL сервера
 const std::string BASE_URL = "http://localhost:8080";
 
 std::string API::Post(const std::string& endpoint, const std::string& body) {
@@ -93,3 +92,4 @@ bool API::Moderate(int student_id, bool approve) {
     std::string response = Post("/moderate", body);
     return JSONTool::UnpackSimpleSuccess(response);
 }
+
