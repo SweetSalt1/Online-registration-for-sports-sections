@@ -1,4 +1,3 @@
-// auth_manager.h
 #ifndef AUTH_MANAGER_H
 #define AUTH_MANAGER_H
 
@@ -17,4 +16,4 @@ public:
                    std::string& token, std::string& role, int& userId);
 };
 
-#endif // AUTH_MANAGER_H
+#endif
