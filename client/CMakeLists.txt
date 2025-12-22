@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 cmake_minimum_required(VERSION 3.10)
 project(SportClient)
 
@@ -37,17 +36,12 @@ target_link_libraries(sport_client
 	Threads::Threads
 )
 
-=======
-# cmake для клиента
-
-# получаем исходные файлы
 file(GLOB_RECURSE CLIENT_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
 )
 
-# получаем заголовочные файлы
 file(GLOB_RECURSE CLIENT_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
@@ -65,7 +59,6 @@ target_include_directories(client_app PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# подключение библиотек
 target_link_libraries(client_app PRIVATE libraries_all)
 target_compile_features(client_app PRIVATE cxx_std_17)
 
@@ -81,4 +74,3 @@ endif()
 if(NOT JSON_FOUND)
 	message(WARNING "Клиент требует JSON (он не найден)")
 endif()
->>>>>>> be0b338162bd95eb542f2c5cd77c708fde8e5d2b
