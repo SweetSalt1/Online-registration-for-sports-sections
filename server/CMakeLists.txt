@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 cmake_minimum_required(VERSION 3.10)
 project(SportServer)
 
@@ -36,8 +35,6 @@ target_link_libraries(sport_server
     pthread
     mysqlcppconn
 )
-=======
-# cmake для сервера
 file(GLOB_RECURSE SERVER_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx
@@ -64,7 +61,6 @@ target_include_directories(server_app PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Подключаем библиотеки для сервера
 target_link_libraries(server_app PRIVATE
 	linbraries_all
 )
@@ -88,4 +84,3 @@ endif()
 #if(NOT MySQL_FOUND)
 #	message(WARNING "Сервер требует MySQL client (он не найден)")
 #endif()
->>>>>>> be0b338162bd95eb542f2c5cd77c708fde8e5d2b
