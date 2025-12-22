@@ -1,4 +1,4 @@
- cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 
 project(Online-registration-for-sports-sections VERSION 1.0.0 LANGUAGES CXX)
 
