@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS applications (
     student_id INT NOT NULL,
     section_id INT NOT NULL,
     status ENUM('pending', 'accepted', 'rejected') NOT NULL DEFAULT 'pending',
+    text TEXT NOT NULL,
     application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (section_id) REFERENCES sections(section_id) ON DELETE CASCADE
